@@ -1004,9 +1004,29 @@
     </div>
     <div id="pipeline-summary" class="fade-up" style="margin-top: 32px; padding: 20px 24px; background: var(--navy-card); border: 1px solid var(--navy-border); border-radius: 12px; font-size:0.85rem; color:var(--white-dim); display:none;">
     </div>
-    <div style="margin-top:12px; font-size:0.72rem; color:var(--slate); display:flex; align-items:center; gap:6px;">
-      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="var(--slate)" stroke-width="1"/><line x1="5" y1="3" x2="5" y2="5.5" stroke="var(--slate)" stroke-width="1" stroke-linecap="round"/><circle cx="5" cy="7" r=".5" fill="var(--slate)"/></svg>
-      Live data — updates automatically when the acquisition pipeline spreadsheet changes.
+    <div id="pipeline-disclaimer" style="margin-top:16px; padding:16px 20px; background:rgba(10,14,26,0.6); border:1px solid var(--navy-border); border-radius:10px; font-size:0.72rem; color:var(--slate); line-height:1.75;">
+      <p>
+        <strong style="color:var(--white-dim);">* Data sourced from third-party marketplace listings</strong>
+        (Flippa.com) and reflect figures as reported by asset sellers at time of listing.
+        Viking Digital Group LLC has not independently verified the accuracy, completeness, or currency of this information.
+        All financial figures, projections, and returns are estimates only, subject to change without notice, and do not
+        constitute a guarantee of future performance. Past or projected revenue of any listed asset is not indicative of
+        future results. This information is provided for informational purposes only and does not constitute an offer to sell,
+        a solicitation of an offer to buy, or a recommendation of any security or investment product.
+        Investments in digital assets involve significant risk, including the possible loss of principal.
+        This document is intended solely for qualified investors as defined under applicable securities laws.
+      </p>
+      <p style="margin-top:10px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+        <span id="pipeline-updated" style="display:inline-flex;align-items:center;gap:5px;">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1"/><path d="M5 3v2.5l1.5 1" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+          Loading update date…
+        </span>
+        <span style="display:inline-flex;align-items:center;gap:5px;">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1"/><line x1="5" y1="3" x2="5" y2="5.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><circle cx="5" cy="7" r=".5" fill="currentColor"/></svg>
+          Live data — reflects pipeline spreadsheet in real time.
+        </span>
+        <span>© 2026 Viking Digital Group LLC. All rights reserved.</span>
+      </p>
     </div>
   </div>
 </section>
@@ -1583,12 +1603,26 @@
         Combined net profit/yr: <strong style="color:var(--gold);">${fmtMoney(totalNetProfit)}</strong> &nbsp;·&nbsp;
         Owner profit/yr: <strong style="color:var(--green);">${fmtMoney(totalOwner)}</strong>`;
 
+      // Extract "Updated: ..." date row from raw CSV rows
+      const updatedRow = rows.find(r => (r['Type'] || '').toLowerCase().startsWith('updated'));
+      const updatedEl  = document.getElementById('pipeline-updated');
+      if (updatedRow && updatedEl) {
+        const dateStr = (updatedRow['Type'] || '').replace(/^updated:\s*/i, '').trim();
+        updatedEl.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1"/><path d="M5 3v2.5l1.5 1" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+          <strong style="color:var(--white-dim);">* Last updated by issuer:</strong> ${dateStr}`;
+      } else if (updatedEl) {
+        updatedEl.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1"/><path d="M5 3v2.5l1.5 1" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+          <strong style="color:var(--white-dim);">* Last updated by issuer:</strong> See source document`;
+      }
+
     } catch (err) {
       console.warn('Pipeline fetch failed:', err);
       document.getElementById('pipeline-body').innerHTML = `
         <tr><td colspan="8" style="text-align:center;padding:28px;color:var(--slate);font-size:.82rem;">
           Unable to load live data. <a href="mailto:jonathan@vikingdigitalgroup.com" style="color:var(--gold)">Contact us</a> for the full pipeline report.
         </td></tr>`;
+      const updatedEl = document.getElementById('pipeline-updated');
+      if (updatedEl) updatedEl.textContent = '* Last updated: see issuer documentation';
     }
   }
 
