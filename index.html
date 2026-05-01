@@ -1539,6 +1539,7 @@
 
       assets.forEach(r => {
         const niche       = getNiche(r['Type']);
+        const emoji       = (r['Icon'] || '').trim() || niche.emoji;
         const price       = parseMoney(r['Purchase price']);
         const netProfitY  = parseMoney(r['Y net profit']);
         const ownerY      = parseMoney(r['Owner profit Y']);
@@ -1567,7 +1568,7 @@
           : '';
 
         html += `<tr>
-          <td><span class="channel-name">${niche.emoji} ${niche.label}</span>${flippaLink}</td>
+          <td><span class="channel-name">${emoji} ${niche.label}</span>${flippaLink}</td>
           <td>${fmtMoney(price)}</td>
           <td>${fmtMoney(netProfitY)}</td>
           <td>${fmtMoney(ownerY)}</td>
