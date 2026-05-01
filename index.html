@@ -990,78 +990,23 @@
             <th>Status</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td><span class="channel-name">🎬 Horror</span></td>
-            <td>$149K</td>
-            <td>$202K</td>
-            <td>$101K</td>
-            <td>0.74x</td>
-            <td>1.5 yrs</td>
-            <td><span class="tag tag-green">68%</span></td>
-            <td><span class="tag tag-gold">Pipeline</span></td>
-          </tr>
-          <tr>
-            <td><span class="channel-name">💪 Motivation</span></td>
-            <td>$325K</td>
-            <td>$420K</td>
-            <td>$210K</td>
-            <td>0.77x</td>
-            <td>1.6 yrs</td>
-            <td><span class="tag tag-green">65%</span></td>
-            <td><span class="tag tag-gold">Pipeline</span></td>
-          </tr>
-          <tr>
-            <td><span class="channel-name">🏛️ Politics</span></td>
-            <td>$285K</td>
-            <td>$288K</td>
-            <td>$144K</td>
-            <td>0.99x</td>
-            <td>2.0 yrs</td>
-            <td><span class="tag tag-green">51%</span></td>
-            <td><span class="tag tag-gold">Pipeline</span></td>
-          </tr>
-          <tr>
-            <td><span class="channel-name">🔍 Mystery</span></td>
-            <td>$475K</td>
-            <td>$264K</td>
-            <td>$132K</td>
-            <td>1.80x</td>
-            <td>3.6 yrs</td>
-            <td><span class="tag tag-green">28%</span></td>
-            <td><span class="tag tag-gold">Pipeline</span></td>
-          </tr>
-          <tr>
-            <td><span class="channel-name">📚 Tutorials</span></td>
-            <td>$310K</td>
-            <td>$144K</td>
-            <td>$72K</td>
-            <td>2.15x</td>
-            <td>4.3 yrs</td>
-            <td><span class="tag tag-green">23%</span></td>
-            <td><span class="tag tag-gold">Pipeline</span></td>
-          </tr>
-          <tr class="total-row">
-            <td>TOTAL / AVG.</td>
-            <td>$1.54M</td>
-            <td>$1.32M</td>
-            <td>$659K</td>
-            <td>1.17x avg</td>
-            <td>2.3 yrs avg</td>
-            <td>43% avg</td>
-            <td></td>
+        <tbody id="pipeline-body">
+          <tr id="pipeline-loading">
+            <td colspan="8" style="text-align:center; padding:36px; color:var(--slate); font-size:.85rem; letter-spacing:.06em;">
+              <span style="display:inline-flex;align-items:center;gap:10px;">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="animation:spin 1s linear infinite"><circle cx="8" cy="8" r="6" stroke="var(--gold-dim)" stroke-width="2"/><path d="M8 2 A6 6 0 0 1 14 8" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/></svg>
+                Loading live pipeline data…
+              </span>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div class="fade-up" style="margin-top: 32px; padding: 20px 24px; background: var(--navy-card); border: 1px solid var(--navy-border); border-radius: 12px; font-size:0.85rem; color:var(--white-dim);">
-      <strong style="color:var(--gold);">Optimization Targets (24-Month):</strong> &nbsp;
-      Horror $101K→$132K (Merch + Affiliate) &nbsp;·&nbsp;
-      Motivation $210K→$262K (Sponsorships + Coaching) &nbsp;·&nbsp;
-      Politics $144K→$173K (Shorts + Multi-format) &nbsp;·&nbsp;
-      Mystery $132K→$172K (Shorts + International) &nbsp;·&nbsp;
-      Tutorials $72K→$101K (Info-products + Upsells)
-      &nbsp;·&nbsp; <strong style="color:var(--green);">Total projected growth: +27% over 24 months</strong>
+    <div id="pipeline-summary" class="fade-up" style="margin-top: 32px; padding: 20px 24px; background: var(--navy-card); border: 1px solid var(--navy-border); border-radius: 12px; font-size:0.85rem; color:var(--white-dim); display:none;">
+    </div>
+    <div style="margin-top:12px; font-size:0.72rem; color:var(--slate); display:flex; align-items:center; gap:6px;">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="var(--slate)" stroke-width="1"/><line x1="5" y1="3" x2="5" y2="5.5" stroke="var(--slate)" stroke-width="1" stroke-linecap="round"/><circle cx="5" cy="7" r=".5" fill="var(--slate)"/></svg>
+      Live data — updates automatically when the acquisition pipeline spreadsheet changes.
     </div>
   </div>
 </section>
@@ -1501,6 +1446,160 @@
   }, { threshold: 0.3 });
   heroIo.observe(heroSection);
 
+  // ─── LIVE PIPELINE FROM GOOGLE SHEETS ───
+  const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRny0J7PGdci4iP0MME_BaL9jsXlOmCJfzqAUeILaWp2JGC-816mGI5ahbTzE1tMYukrAp6Qc5i2HHx/pub?gid=33024839&single=true&output=csv';
+
+  function parseLine(line) {
+    const result = []; let cur = ''; let inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
+      else { cur += c; }
+    }
+    result.push(cur);
+    return result;
+  }
+
+  function parseCSV(text) {
+    const lines = text.split('\n').filter(l => l.trim());
+    const headers = parseLine(lines[0]).map(h => h.trim());
+    return lines.slice(1).map(line => {
+      const vals = parseLine(line);
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = (vals[i] || '').trim(); });
+      return obj;
+    });
+  }
+
+  function parseMoney(v) { return parseFloat((v || '').replace(/[$,]/g, '')) || 0; }
+  function fmtMoney(n) {
+    if (n >= 1e6) return '$' + (n / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M';
+    if (n >= 1e3) return '$' + Math.round(n / 1e3) + 'K';
+    return '$' + Math.round(n);
+  }
+
+  function getNiche(type) {
+    const t = (type || '').toLowerCase();
+    if (t.includes('terror') || t.includes('horror')) return { emoji: '🎬', label: 'Horror / Terror', platform: 'YouTube' };
+    if (t.includes('motivat'))                         return { emoji: '💪', label: 'Motivation',       platform: 'YouTube' };
+    if (t.includes('politi'))                          return { emoji: '🏛️', label: 'Political',        platform: 'YouTube' };
+    if (t.includes('mysteri'))                         return { emoji: '🔍', label: 'Mystery',          platform: 'YouTube' };
+    if (t.includes('how-to') || t.includes('tutori')) return { emoji: '📚', label: 'How-to / Tutorials', platform: 'YouTube' };
+    if (t.includes('shopify') || t.includes('cali'))  return { emoji: '🛍️', label: type,               platform: 'Shopify' };
+    if (t.includes('inspector') || t.includes('crime')) return { emoji: '🔎', label: 'True Crime',      platform: 'YouTube' };
+    return { emoji: '📺', label: type, platform: 'YouTube' };
+  }
+
+  function roiColor(roi) {
+    if (roi >= 60) return 'tag-green';
+    if (roi >= 35) return 'tag-green';
+    return 'tag-green';
+  }
+
+  async function loadPipeline() {
+    try {
+      const resp = await fetch(SHEET_CSV);
+      if (!resp.ok) throw new Error('fetch failed');
+      const text = await resp.text();
+      const rows = parseCSV(text);
+
+      // Filter: must have a Type and a positive purchase price
+      const assets = rows.filter(r => {
+        const type = (r['Type'] || '').trim();
+        const price = parseMoney(r['Purchase price']);
+        return type && !type.startsWith(',') && price > 0;
+      });
+
+      if (!assets.length) throw new Error('no data');
+
+      const tbody = document.getElementById('pipeline-body');
+      let html = '';
+      let totalPrice = 0, totalNetProfit = 0, totalOwner = 0, totalPayback = 0;
+
+      assets.forEach(r => {
+        const niche       = getNiche(r['Type']);
+        const price       = parseMoney(r['Purchase price']);
+        const netProfitY  = parseMoney(r['Y net profit']);
+        const ownerY      = parseMoney(r['Owner profit Y']);
+        const payback     = parseFloat(r['Rpt years']) || 0;
+        const margin      = parseFloat(r['% margin']) || 0;
+        const roi         = price > 0 ? Math.round((netProfitY / price) * 100) : 0;
+        const flippaUrl   = (r['Link Flippa'] || '').trim();
+
+        totalPrice     += price;
+        totalNetProfit += netProfitY;
+        totalOwner     += ownerY;
+        totalPayback   += payback;
+
+        const platformTag = niche.platform === 'Shopify'
+          ? '<span class="tag" style="background:rgba(150,230,150,0.12);color:#7BDA8F;">Shopify</span>'
+          : '<span class="tag tag-gold">Pipeline</span>';
+
+        const flippaLink = flippaUrl
+          ? `<a href="${flippaUrl}" target="_blank" rel="noopener noreferrer"
+               title="View on Flippa"
+               style="display:inline-flex;align-items:center;gap:4px;color:var(--slate);font-size:.75rem;margin-left:6px;transition:color .2s;"
+               onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--slate)'">
+               <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7M8 1h3m0 0v3M11 1 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+               Flippa
+             </a>`
+          : '';
+
+        html += `<tr>
+          <td><span class="channel-name">${niche.emoji} ${niche.label}</span>${flippaLink}</td>
+          <td>${fmtMoney(price)}</td>
+          <td>${fmtMoney(netProfitY)}</td>
+          <td>${fmtMoney(ownerY)}</td>
+          <td>${payback.toFixed(2)}x</td>
+          <td>${payback.toFixed(1)} yrs</td>
+          <td><span class="tag tag-green">${roi}%</span></td>
+          <td>${platformTag}</td>
+        </tr>`;
+      });
+
+      // Totals row
+      const avgPayback = (totalPayback / assets.length).toFixed(1);
+      const avgRoi     = totalPrice > 0 ? Math.round((totalNetProfit / totalPrice) * 100) : 0;
+      html += `<tr class="total-row">
+        <td>TOTAL / AVG. <span style="font-size:.7rem;font-weight:400;color:var(--gold-dim);">(${assets.length} assets)</span></td>
+        <td>${fmtMoney(totalPrice)}</td>
+        <td>${fmtMoney(totalNetProfit)}</td>
+        <td>${fmtMoney(totalOwner)}</td>
+        <td>—</td>
+        <td>${avgPayback} yrs avg</td>
+        <td>${avgRoi}% avg</td>
+        <td></td>
+      </tr>`;
+
+      tbody.innerHTML = html;
+
+      // Summary bar
+      const summary = document.getElementById('pipeline-summary');
+      summary.style.display = 'block';
+      summary.innerHTML = `<strong style="color:var(--gold);">Live Portfolio Snapshot:</strong>
+        &nbsp; <strong>${assets.length} assets</strong> identified &nbsp;·&nbsp;
+        Total deployment: <strong style="color:var(--gold);">${fmtMoney(totalPrice)}</strong> &nbsp;·&nbsp;
+        Combined net profit/yr: <strong style="color:var(--gold);">${fmtMoney(totalNetProfit)}</strong> &nbsp;·&nbsp;
+        Owner profit/yr: <strong style="color:var(--green);">${fmtMoney(totalOwner)}</strong>`;
+
+    } catch (err) {
+      console.warn('Pipeline fetch failed:', err);
+      document.getElementById('pipeline-body').innerHTML = `
+        <tr><td colspan="8" style="text-align:center;padding:28px;color:var(--slate);font-size:.82rem;">
+          Unable to load live data. <a href="mailto:jonathan@vikingdigitalgroup.com" style="color:var(--gold)">Contact us</a> for the full pipeline report.
+        </td></tr>`;
+    }
+  }
+
+  loadPipeline();
+
+  // Spinner keyframe
+  const spinStyle = document.createElement('style');
+  spinStyle.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+  document.head.appendChild(spinStyle);
+
+  // ─── ANIMATE ALLOC BARS ───
   // Animate alloc bars when visible
   const allocIo = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
