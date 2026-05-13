@@ -1,0 +1,7 @@
+# Redirect /intranet to login if not authenticated
+# Netlify Identity handles this via the widget itself,
+# but these rules ensure clean routing
+
+/intranet           /intranet/index.html   200
+/intranet/          /intranet/index.html   200
+/intranet/tracker   /intranet/tracker.html 200

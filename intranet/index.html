@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VDG Intranet — Sign In</title>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0D1117;
+    --navy2: #161D27;
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --white: #F0EDE6;
+    --muted: rgba(240,237,230,0.5);
+    --border: rgba(201,168,76,0.2);
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  .card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--navy2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2.5rem;
+    text-align: center;
+  }
+  .logo-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 2rem;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    border: 2px solid var(--gold);
+    transform: rotate(45deg);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-icon span { transform: rotate(-45deg); font-size: 12px; color: var(--gold); }
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 700;
+    letter-spacing: .1em;
+    color: var(--gold);
+    text-transform: uppercase;
+    text-align: left;
+    line-height: 1.2;
+  }
+  .logo-text small {
+    display: block;
+    font-size: 9px;
+    letter-spacing: .15em;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 700;
+    margin-bottom: 8px;
+  }
+  p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+  .btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--gold);
+    color: var(--navy);
+    border: none;
+    border-radius: 6px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .btn:hover { background: var(--gold-light); }
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+  }
+  .footer-note {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .error-msg {
+    font-size: 12px;
+    color: #EF4444;
+    margin-top: 12px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-wrap">
+    <div class="logo-icon"><span>V</span></div>
+    <div class="logo-text">
+      Viking Digital Group
+      <small>INTRANET PORTAL</small>
+    </div>
+  </div>
+  <h1>Sign In</h1>
+  <p>Access is restricted to authorized Viking Digital Group team members.</p>
+  <button class="btn" id="login-btn" onclick="openLogin()">Sign in with email →</button>
+  <p class="error-msg" id="err">Login failed. Please check your credentials.</p>
+  <hr class="divider">
+  <p class="footer-note">vikingdigitalgroup.com · Confidential</p>
+</div>
+
+<script>
+  netlifyIdentity.on('init', user => {
+    if (user) window.location.href = '/intranet/tracker.html';
+  });
+
+  netlifyIdentity.on('login', user => {
+    netlifyIdentity.close();
+    window.location.href = '/intranet/tracker.html';
+  });
+
+  netlifyIdentity.on('error', err => {
+    document.getElementById('err').style.display = 'block';
+  });
+
+  function openLogin() {
+    netlifyIdentity.open('login');
+  }
+</script>
+</body>
+</html>
