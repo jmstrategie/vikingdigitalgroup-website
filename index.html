@@ -732,6 +732,17 @@
       .stat-card-grid { grid-template-columns: 1fr; }
     }
   </style>
+  <!-- Netlify Identity: handles invite/password-reset tokens from emails -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script>
+    window.netlifyIdentity && window.netlifyIdentity.on('init', function(user) {
+      if (!user) {
+        window.netlifyIdentity.on('login', function() {
+          window.location.href = '/intranet/tracker.html';
+        });
+      }
+    });
+  </script>
 </head>
 <body>
 
