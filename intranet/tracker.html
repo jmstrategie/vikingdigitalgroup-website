@@ -178,13 +178,25 @@ td { padding: 10px 12px; vertical-align: middle; }
 
 /* ── OTHER CELLS ── */
 .date-cell { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); white-space: nowrap; }
-.notes-inp {
-  background: transparent; border: none;
-  font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--muted);
-  width: 100%; outline: none; min-width: 120px;
+.notes-cell {
+  cursor: pointer; min-width: 140px; max-width: 240px;
 }
-.notes-inp:focus { color: var(--white); }
-.notes-inp::placeholder { color: rgba(240,237,230,0.18); }
+.notes-preview {
+  font-size: 12px; color: var(--muted); line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; word-break: break-word;
+  transition: color .12s;
+}
+.notes-cell:hover .notes-preview { color: var(--white); }
+.notes-empty { color: rgba(240,237,230,0.2); font-size: 12px; }
+.notes-inp {
+  width: 100%; min-width: 180px; min-height: 70px;
+  background: var(--navy3); border: 1px solid var(--border);
+  border-radius: 5px; padding: 6px 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--white);
+  resize: vertical; outline: none; line-height: 1.5; display: block;
+}
+.notes-inp:focus { border-color: var(--gold); }
 .del-btn {
   background: transparent; border: none; color: rgba(240,237,230,0.18);
   cursor: pointer; font-size: 18px; transition: color .12s; padding: 2px 6px; line-height: 1;
@@ -499,7 +511,11 @@ function render() {
           </div>
         </td>
         <td class="date-cell">${i.dateSent || '—'}${i.dateReplied ? '<br><span style="color:var(--replied);font-size:10px">↩ '+i.dateReplied+'</span>' : ''}</td>
-        <td><input class="notes-inp" value="${esc(i.notes || '')}" placeholder="Add note…" onblur="updNotes('${i.id}',this.value)" /></td>
+        <td class="notes-cell" id="ncell-${i.id}" onclick="expandNote('${i.id}')">
+          ${i.notes
+            ? `<div class="notes-preview" id="npreview-${i.id}">${esc(i.notes)}</div>`
+            : `<div class="notes-empty" id="npreview-${i.id}">Add note…</div>`}
+        </td>
         <td><button class="del-btn" onclick="del('${i.id}')">×</button></td>
       </tr>`;
 
@@ -578,6 +594,35 @@ function updStatus(id, val, sel) {
   if (sel) { sel.className = 'status-sel ' + stClass(val); }
   saveOverrides();
   updateStats();
+}
+
+function expandNote(id) {
+  const cell = document.getElementById('ncell-' + id);
+  if (!cell || cell.querySelector('textarea')) return; // already expanded
+  const inv  = investors.find(x => x.id === id);
+  if (!inv) return;
+  cell.onclick = null; // prevent re-trigger
+  const ta = document.createElement('textarea');
+  ta.className   = 'notes-inp';
+  ta.value       = inv.notes || '';
+  ta.placeholder = 'Add note…';
+  ta.rows        = 3;
+  cell.innerHTML = '';
+  cell.appendChild(ta);
+  ta.focus();
+  // move cursor to end
+  ta.selectionStart = ta.selectionEnd = ta.value.length;
+  ta.addEventListener('blur', () => {
+    updNotes(id, ta.value);
+    // restore preview
+    const preview = inv.notes
+      ? `<div class="notes-preview" id="npreview-${id}">${esc(inv.notes)}</div>`
+      : `<div class="notes-empty" id="npreview-${id}">Add note…</div>`;
+    cell.innerHTML = preview;
+    cell.onclick   = () => expandNote(id);
+  });
+  // stop row-level click bubbling
+  ta.addEventListener('click', e => e.stopPropagation());
 }
 
 function updNotes(id, val) {
