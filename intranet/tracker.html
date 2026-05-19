@@ -9,114 +9,235 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --navy: #0D1117;
-  --navy2: #161D27;
-  --navy3: #1E2A38;
-  --gold: #C9A84C;
-  --gold-light: #E8C97A;
-  --gold-dim: rgba(201,168,76,0.12);
-  --white: #F0EDE6;
-  --muted: rgba(240,237,230,0.45);
-  --border: rgba(201,168,76,0.18);
-  --sent-bg: rgba(37,99,235,0.12);    --sent: #60A5FA;
-  --replied-bg: rgba(22,163,74,0.12); --replied: #4ADE80;
-  --pass-bg: rgba(107,114,128,0.12);  --pass: #9CA3AF;
-  --pending-bg: rgba(201,168,76,0.12);--pending: #C9A84C;
+  --navy:        #0D1117;
+  --navy2:       #161D27;
+  --navy3:       #1E2A38;
+  --gold:        #C9A84C;
+  --gold-light:  #E8C97A;
+  --gold-dim:    rgba(201,168,76,0.12);
+  --white:       #F0EDE6;
+  --muted:       rgba(240,237,230,0.45);
+  --border:      rgba(201,168,76,0.18);
+  --border2:     rgba(240,237,230,0.07);
+  /* status */
+  --sent-bg:     rgba(37,99,235,0.12);   --sent:    #60A5FA;
+  --replied-bg:  rgba(22,163,74,0.12);   --replied: #4ADE80;
+  --pass-bg:     rgba(107,114,128,0.12); --pass:    #9CA3AF;
+  --pending-bg:  rgba(201,168,76,0.12);  --pending: #C9A84C;
+  /* intent */
+  --int-call-bg:      rgba(201,168,76,0.18);  --int-call:      #E8C97A;
+  --int-interest-bg:  rgba(34,197,94,0.14);   --int-interest:  #4ADE80;
+  --int-followup-bg:  rgba(59,130,246,0.14);  --int-followup:  #60A5FA;
+  --int-info-bg:      rgba(139,92,246,0.14);  --int-info:      #A78BFA;
+  --int-pass-bg:      rgba(107,114,128,0.12); --int-pass:      #9CA3AF;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--white); min-height: 100vh; font-size: 14px; }
 
-/* NAV */
+/* ── NAV ── */
 nav {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 1rem 2rem;
+  padding: .875rem 2rem;
   border-bottom: 1px solid var(--border);
   position: sticky; top: 0; background: var(--navy); z-index: 10;
+  gap: 1rem;
 }
-.logo { display: flex; align-items: center; gap: 10px; }
-.logo-icon { width: 26px; height: 26px; border: 1.5px solid var(--gold); transform: rotate(45deg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.logo-icon { width: 26px; height: 26px; border: 1.5px solid var(--gold); transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
 .logo-icon span { transform: rotate(-45deg); font-size: 10px; color: var(--gold); }
 .logo-name { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .1em; color: var(--gold); text-transform: uppercase; }
-.nav-right { display: flex; align-items: center; gap: 16px; }
+.nav-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
 .user-pill { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; }
-.sync-btn, .signout-btn {
+.nav-btn {
   font-size: 12px; padding: 6px 14px; border-radius: 4px; cursor: pointer;
   font-family: 'DM Sans', sans-serif; font-weight: 500; transition: all .15s;
 }
-.sync-btn { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--border); }
-.sync-btn:hover { border-color: var(--gold); }
-.sync-btn.syncing { opacity: .6; cursor: not-allowed; }
-.signout-btn { background: transparent; color: var(--muted); border: 1px solid transparent; }
-.signout-btn:hover { border-color: var(--border); color: var(--white); }
+.btn-sync    { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--border); }
+.btn-sync:hover { border-color: var(--gold); }
+.btn-sync.syncing { opacity: .6; cursor: not-allowed; }
+.btn-ghost   { background: transparent; color: var(--muted); border: 1px solid transparent; }
+.btn-ghost:hover { border-color: var(--border); color: var(--white); }
 
-/* MAIN */
-main { padding: 2rem; max-width: 1400px; margin: 0 auto; }
-.stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 2rem; }
-.stat { background: var(--navy2); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; }
-.slabel { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
-.sval { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 700; color: var(--gold); line-height: 1; }
+/* ── MAIN ── */
+main { padding: 1.5rem 2rem; max-width: 1500px; margin: 0 auto; }
 
-/* TABLE */
-.table-wrap { background: var(--navy2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem; }
-.day-header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: var(--gold-dim); border-bottom: 1px solid var(--border); }
+/* ── STATS ── */
+.stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 1.75rem; }
+.stat {
+  background: var(--navy2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 1.1rem 1.25rem;
+  transition: border-color .15s; cursor: default;
+}
+.stat.clickable { cursor: pointer; }
+.stat.clickable:hover { border-color: var(--gold); }
+.stat.active { border-color: var(--gold); background: var(--gold-dim); }
+.slabel { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.sval { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; color: var(--gold); line-height: 1; }
+.sval.warm { color: var(--int-call); }
+
+/* ── SYNC BANNER ── */
+.sync-banner {
+  display: none; align-items: center; gap: 10px;
+  background: var(--gold-dim); border: 1px solid var(--border);
+  border-radius: 6px; padding: 10px 16px; margin-bottom: 1.25rem;
+  font-size: 13px; color: var(--gold);
+}
+.sync-banner.visible { display: flex; }
+
+/* ── TABLE WRAP ── */
+.table-wrap { background: var(--navy2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 1.25rem; }
+.day-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 16px; background: var(--gold-dim); border-bottom: 1px solid var(--border);
+}
 .day-label { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
-.day-date { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
+.day-date  { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
+.day-count { margin-left: auto; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
+
 table { width: 100%; border-collapse: collapse; }
-thead th { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
-tbody tr { border-bottom: 1px solid rgba(201,168,76,0.07); transition: background .1s; }
-tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: rgba(201,168,76,0.03); }
-td { padding: 11px 14px; vertical-align: middle; }
+thead th {
+  font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--muted);
+  padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody tr.inv-row { border-bottom: 1px solid var(--border2); transition: background .1s; }
+tbody tr.inv-row:hover { background: rgba(201,168,76,0.03); }
+tbody tr.inv-row.has-ai:hover td { background: rgba(201,168,76,0.03); }
+tbody tr.ai-row { border-bottom: 1px solid var(--border2); background: rgba(14,20,28,0.5); }
+tbody tr.ai-row.hidden { display: none; }
+td { padding: 10px 12px; vertical-align: middle; }
+
+/* ── INVESTOR CELL ── */
 .inv-name a { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; color: var(--white); text-decoration: none; transition: color .12s; }
 .inv-name a:hover { color: var(--gold); }
 .inv-loc { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.focus-tag { display: inline-block; font-size: 10px; padding: 2px 7px; background: var(--navy3); border: 1px solid var(--border); border-radius: 3px; color: var(--muted); font-family: 'DM Mono', monospace; }
-.vbtn { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 4px 10px; background: var(--navy3); border: 1px solid var(--border); border-radius: 4px; color: var(--gold); cursor: pointer; transition: all .12s; font-family: 'DM Mono', monospace; }
+
+/* ── MISC CELLS ── */
+.focus-tag {
+  display: inline-block; font-size: 10px; padding: 2px 7px;
+  background: var(--navy3); border: 1px solid var(--border);
+  border-radius: 3px; color: var(--muted); font-family: 'DM Mono', monospace;
+  white-space: nowrap;
+}
+.vbtn {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 500; padding: 4px 10px;
+  background: var(--navy3); border: 1px solid var(--border);
+  border-radius: 4px; color: var(--gold); cursor: pointer;
+  transition: all .12s; font-family: 'DM Mono', monospace; white-space: nowrap;
+}
 .vbtn:hover { border-color: var(--gold); background: var(--gold-dim); }
-.subj-cell { font-size: 11px; color: var(--muted); max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.status-sel { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; padding: 4px 8px; border-radius: 4px; border: none; cursor: pointer; outline: none; -webkit-appearance: none; }
+.subj-cell { font-size: 11px; color: var(--muted); max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── STATUS + INTENT ── */
+.status-wrap { display: flex; flex-direction: column; gap: 5px; }
+.status-sel {
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+  padding: 4px 8px; border-radius: 4px; border: none; cursor: pointer;
+  outline: none; -webkit-appearance: none; width: fit-content;
+}
 .st-pending { background: var(--pending-bg); color: var(--pending); }
 .st-sent    { background: var(--sent-bg);    color: var(--sent); }
 .st-replied { background: var(--replied-bg); color: var(--replied); }
 .st-pass    { background: var(--pass-bg);    color: var(--pass); }
-.date-cell { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
-.notes-inp { background: transparent; border: none; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--muted); width: 100%; outline: none; }
+
+.intent-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-family: 'DM Mono', monospace; font-weight: 500;
+  padding: 2px 7px; border-radius: 3px; white-space: nowrap;
+}
+.intent-call      { background: var(--int-call-bg);     color: var(--int-call); }
+.intent-interested{ background: var(--int-interest-bg); color: var(--int-interest); }
+.intent-followup  { background: var(--int-followup-bg); color: var(--int-followup); }
+.intent-info      { background: var(--int-info-bg);     color: var(--int-info); }
+.intent-pass      { background: var(--int-pass-bg);     color: var(--int-pass); }
+
+/* ── AI ROW ── */
+.ai-expand-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: 11px; padding: 0 4px;
+  transition: color .12s; font-family: 'DM Mono', monospace;
+  display: inline-flex; align-items: center; gap: 3px;
+}
+.ai-expand-btn:hover { color: var(--gold); }
+.ai-expand-btn .chevron { transition: transform .15s; display: inline-block; }
+.ai-expand-btn.open .chevron { transform: rotate(180deg); }
+
+.ai-content {
+  display: flex; gap: 2rem; padding: 10px 12px 12px 40px;
+  flex-wrap: wrap;
+}
+.ai-block { flex: 1; min-width: 160px; }
+.ai-block-label {
+  font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 4px;
+}
+.ai-block-text { font-size: 12px; color: var(--white); line-height: 1.5; }
+.ai-block-text.action { color: var(--gold-light); }
+
+/* ── OTHER CELLS ── */
+.date-cell { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); white-space: nowrap; }
+.notes-inp {
+  background: transparent; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--muted);
+  width: 100%; outline: none; min-width: 120px;
+}
 .notes-inp:focus { color: var(--white); }
 .notes-inp::placeholder { color: rgba(240,237,230,0.18); }
-.del-btn { background: transparent; border: none; color: rgba(240,237,230,0.18); cursor: pointer; font-size: 18px; transition: color .12s; padding: 2px 6px; line-height: 1; }
+.del-btn {
+  background: transparent; border: none; color: rgba(240,237,230,0.18);
+  cursor: pointer; font-size: 18px; transition: color .12s; padding: 2px 6px; line-height: 1;
+}
 .del-btn:hover { color: #EF4444; }
+.empty-state { text-align: center; padding: 3rem 2rem; color: var(--muted); font-size: 13px; }
 
-/* SYNC BANNER */
-.sync-banner { display: none; align-items: center; gap: 10px; background: var(--gold-dim); border: 1px solid var(--border); border-radius: 6px; padding: 10px 16px; margin-bottom: 1.5rem; font-size: 13px; color: var(--gold); }
-.sync-banner.visible { display: flex; }
-
-/* MODAL */
+/* ── MODAL ── */
 .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
 .overlay.open { display: flex; }
-.modal { background: var(--navy2); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; width: 580px; max-width: 95vw; max-height: 88vh; overflow-y: auto; }
+.modal {
+  background: var(--navy2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2rem; width: 580px;
+  max-width: 95vw; max-height: 88vh; overflow-y: auto;
+}
 .modal-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
 .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 1.25rem; }
-.vtabs { display: flex; gap: 8px; margin-bottom: 1rem; }
-.vtab { font-family: 'DM Mono', monospace; font-size: 11px; padding: 5px 12px; border-radius: 4px; border: 1px solid var(--border); cursor: pointer; background: transparent; color: var(--muted); transition: all .12s; }
+.vtabs { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+.vtab {
+  font-family: 'DM Mono', monospace; font-size: 11px; padding: 5px 12px;
+  border-radius: 4px; border: 1px solid var(--border); cursor: pointer;
+  background: transparent; color: var(--muted); transition: all .12s;
+}
 .vtab:hover { border-color: var(--gold); color: var(--gold); }
 .vtab.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
-.rec-badge { font-size: 11px; color: var(--gold); background: var(--gold-dim); border: 1px solid var(--border); border-radius: 4px; padding: 6px 12px; margin-bottom: 1rem; font-family: 'DM Mono', monospace; display: none; }
+.rec-badge {
+  font-size: 11px; color: var(--gold); background: var(--gold-dim);
+  border: 1px solid var(--border); border-radius: 4px; padding: 6px 12px;
+  margin-bottom: 1rem; font-family: 'DM Mono', monospace; display: none;
+}
 .flabel { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: block; margin: 12px 0 5px; }
-.finput, .ftarea { width: 100%; background: var(--navy); border: 1px solid var(--border); border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--white); padding: 8px 12px; outline: none; transition: border-color .12s; }
+.finput, .ftarea {
+  width: 100%; background: var(--navy); border: 1px solid var(--border);
+  border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 13px;
+  color: var(--white); padding: 8px 12px; outline: none; transition: border-color .12s;
+}
 .finput:focus, .ftarea:focus { border-color: var(--gold); }
 .ftarea { resize: vertical; min-height: 180px; line-height: 1.65; }
 .mfoot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.5rem; flex-wrap: wrap; }
 .btn { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: 5px; cursor: pointer; transition: all .15s; }
-.btn-gold { background: var(--gold); color: var(--navy); border: none; }
+.btn-gold    { background: var(--gold); color: var(--navy); border: none; }
 .btn-gold:hover { background: var(--gold-light); }
 .btn-outline { background: transparent; color: var(--gold); border: 1px solid var(--border); }
 .btn-outline:hover { border-color: var(--gold); background: var(--gold-dim); }
 
-/* EMPTY */
-.empty-state { text-align: center; padding: 3rem 2rem; color: var(--muted); font-size: 13px; }
-
-/* TOAST */
-.toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--navy2); border: 1px solid var(--gold); border-radius: 6px; padding: 12px 20px; font-size: 13px; color: var(--gold); z-index: 200; opacity: 0; transform: translateY(10px); transition: all .25s; pointer-events: none; }
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 2rem; right: 2rem;
+  background: var(--navy2); border: 1px solid var(--gold); border-radius: 6px;
+  padding: 12px 20px; font-size: 13px; color: var(--gold); z-index: 200;
+  opacity: 0; transform: translateY(10px); transition: all .25s; pointer-events: none;
+  font-family: 'DM Mono', monospace;
+}
 .toast.show { opacity: 1; transform: translateY(0); }
 </style>
 </head>
@@ -129,15 +250,14 @@ td { padding: 11px 14px; vertical-align: middle; }
   </div>
   <div class="nav-right">
     <span class="user-pill" id="user-email"></span>
-    <button class="sync-btn" id="sync-btn" onclick="syncFromSheet()">↻ Sync Sheet</button>
-    <button class="signout-btn" onclick="signOut()">Sign out</button>
+    <button class="nav-btn btn-sync" id="sync-btn" onclick="syncFromSheet()">↻ Sync Sheet</button>
+    <button class="nav-btn btn-ghost" onclick="signOut()">Sign out</button>
   </div>
 </nav>
 
 <main>
   <div class="sync-banner" id="sync-banner">
-    <span>⚡</span>
-    <span id="sync-msg">Synced from Google Sheets</span>
+    <span>⚡</span><span id="sync-msg"></span>
     <button style="margin-left:auto;background:transparent;border:none;color:var(--gold);cursor:pointer;font-size:16px" onclick="this.parentElement.classList.remove('visible')">×</button>
   </div>
 
@@ -145,6 +265,7 @@ td { padding: 11px 14px; vertical-align: middle; }
     <div class="stat"><div class="slabel">Total Investors</div><div class="sval" id="s-total">0</div></div>
     <div class="stat"><div class="slabel">Sent</div><div class="sval" id="s-sent">0</div></div>
     <div class="stat"><div class="slabel">Replied</div><div class="sval" id="s-replied">0</div></div>
+    <div class="stat"><div class="slabel">Warm Leads</div><div class="sval warm" id="s-warm">0</div></div>
     <div class="stat"><div class="slabel">Reply Rate</div><div class="sval" id="s-rate">—</div></div>
   </div>
 
@@ -155,9 +276,9 @@ td { padding: 11px 14px; vertical-align: middle; }
 <div class="overlay" id="ov-msg">
   <div class="modal">
     <div class="modal-title" id="m-name"></div>
-    <div class="modal-sub" id="m-sub"></div>
-    <div class="rec-badge" id="m-rec"></div>
-    <div class="vtabs" id="m-vtabs"></div>
+    <div class="modal-sub"   id="m-sub"></div>
+    <div class="rec-badge"   id="m-rec"></div>
+    <div class="vtabs"       id="m-vtabs"></div>
     <label class="flabel">Subject line</label>
     <input class="finput" id="m-subj" readonly />
     <label class="flabel">Message body</label>
@@ -165,7 +286,7 @@ td { padding: 11px 14px; vertical-align: middle; }
     <div class="mfoot">
       <button class="btn btn-outline" onclick="closeMsg()">Close</button>
       <button class="btn btn-outline" onclick="copyMsg()">Copy message</button>
-      <button class="btn btn-gold" onclick="markSent()">Mark as sent →</button>
+      <button class="btn btn-gold"    onclick="markSent()">Mark as sent →</button>
     </div>
   </div>
 </div>
@@ -173,231 +294,378 @@ td { padding: 11px 14px; vertical-align: middle; }
 <div class="toast" id="toast"></div>
 
 <script>
-// ── AUTH GUARD ──
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+// Paste your published Google Sheet CSV URL here after setup (see automation.md)
+const SHEET_CSV_URL = '';
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
 netlifyIdentity.on('init', user => {
-  if (!user) window.location.href = '/intranet/';
-  else {
-    const email = user.email || '';
-    document.getElementById('user-email').textContent = email;
-    init();
-  }
+  if (!user) { window.location.href = '/intranet/'; return; }
+  document.getElementById('user-email').textContent = user.email || '';
+  init();
 });
 netlifyIdentity.on('logout', () => window.location.href = '/intranet/');
 function signOut() { netlifyIdentity.logout(); }
 
-// ── DATA ──
-const SK = 'vdg_intranet_v1';
-let investors = [];
-let activeId = null, activeTab = 'A';
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const SK = 'vdg_intranet_v2';
+let investors  = [];
+let activeId   = null;
+let activeTab  = 'A';
+let filterStatus = 'all';
 
 async function init() {
-  // Try loading from localStorage first (for status/notes overrides)
   const overrides = loadOverrides();
-  // Fetch master data from investors.json
   try {
-    const res = await fetch('/intranet/investors.json?t=' + Date.now());
+    const res  = await fetch('/intranet/investors.json?t=' + Date.now());
     const data = await res.json();
-    investors = data.investors.map(inv => {
-      const ov = overrides[inv.id] || {};
-      return { ...inv, status: ov.status || inv.status, dateSent: ov.dateSent || inv.dateSent, notes: ov.notes !== undefined ? ov.notes : inv.notes, variant: ov.variant || inv.variant };
-    });
-    document.getElementById('sync-msg').textContent = `Data loaded · Last updated: ${data.lastUpdated}`;
+    investors  = data.investors.map(inv => mergeOverride(inv, overrides[inv.id] || {}));
+    document.getElementById('sync-msg').textContent = 'Data loaded · Last updated: ' + data.lastUpdated;
   } catch(e) {
-    investors = Object.values(overrides).length ? Object.values(overrides) : [];
+    investors = Object.values(overrides);
     showToast('Could not load investors.json — showing cached data');
   }
   render();
 }
 
-// Only persist user overrides (status, notes, date, variant) in localStorage
+function mergeOverride(inv, ov) {
+  return {
+    ...inv,
+    status:          ov.status          !== undefined ? ov.status          : inv.status,
+    dateSent:        ov.dateSent        !== undefined ? ov.dateSent        : inv.dateSent,
+    dateReplied:     ov.dateReplied     || '',
+    intent:          ov.intent          || '',
+    intentLabel:     ov.intentLabel     || '',
+    aiSummary:       ov.aiSummary       || '',
+    suggestedAction: ov.suggestedAction || '',
+    notes:           ov.notes           !== undefined ? ov.notes           : (inv.notes || ''),
+    variant:         ov.variant         !== undefined ? ov.variant         : inv.variant,
+  };
+}
+
 function loadOverrides() {
   try { return JSON.parse(localStorage.getItem(SK) || '{}'); } catch(e) { return {}; }
 }
 function saveOverrides() {
   const ov = {};
-  investors.forEach(i => { ov[i.id] = { status: i.status, dateSent: i.dateSent, notes: i.notes, variant: i.variant }; });
+  investors.forEach(i => {
+    ov[i.id] = {
+      status: i.status, dateSent: i.dateSent, dateReplied: i.dateReplied,
+      intent: i.intent, intentLabel: i.intentLabel,
+      aiSummary: i.aiSummary, suggestedAction: i.suggestedAction,
+      notes: i.notes, variant: i.variant,
+    };
+  });
   localStorage.setItem(SK, JSON.stringify(ov));
 }
 
-// ── GOOGLE SHEETS SYNC ──
-// Set your published Sheet CSV URL below after publishing the sheet
-const SHEET_CSV_URL = ''; // e.g. https://docs.google.com/spreadsheets/d/SHEET_ID/export?format=csv
+// ── GOOGLE SHEETS SYNC ────────────────────────────────────────────────────────
+// Expected Sheet columns (row 1 = headers):
+// A: id | B: name | C: status | D: dateSent | E: dateReplied
+// F: intent | G: intentLabel | H: aiSummary | I: suggestedAction | J: notes | K: variant
 
 async function syncFromSheet() {
   if (!SHEET_CSV_URL) {
-    showToast('No Google Sheet URL configured — see SETUP.md');
+    showToast('No Sheet URL set — see automation.md for setup');
     return;
   }
   const btn = document.getElementById('sync-btn');
-  btn.textContent = '↻ Syncing…'; btn.classList.add('syncing');
+  btn.textContent = '↻ Syncing…';
+  btn.classList.add('syncing');
   try {
-    const res = await fetch(SHEET_CSV_URL);
-    const csv = await res.text();
-    const rows = csv.trim().split('\n').slice(1); // skip header
-    const overrides = loadOverrides();
-    rows.forEach(row => {
-      const cols = row.split(',').map(c => c.replace(/^"|"$/g,'').trim());
-      const [id,,,,, status, dateSent,, notes, variant] = cols;
-      if (id && overrides[id] !== undefined) {
-        if (status) overrides[id].status = status;
-        if (dateSent) overrides[id].dateSent = dateSent;
-        if (notes) overrides[id].notes = notes;
-        if (variant) overrides[id].variant = variant;
+    const res  = await fetch(SHEET_CSV_URL + '&t=' + Date.now());
+    const csv  = await res.text();
+    const rows = parseCSV(csv).slice(1); // skip header row
+    const ov   = loadOverrides();
+    let updated = 0;
+    rows.forEach(cols => {
+      const id = (cols[0] || '').trim();
+      if (!id) return;
+      if (!ov[id]) ov[id] = {};
+      const patch = {
+        status:          cols[2]  || ov[id].status,
+        dateSent:        cols[3]  || ov[id].dateSent,
+        dateReplied:     cols[4]  || '',
+        intent:          cols[5]  || '',
+        intentLabel:     cols[6]  || '',
+        aiSummary:       cols[7]  || '',
+        suggestedAction: cols[8]  || '',
+        notes:           cols[9]  !== undefined ? cols[9] : (ov[id].notes || ''),
+        variant:         cols[10] || ov[id].variant,
+      };
+      // Only update if something changed
+      if (JSON.stringify(patch) !== JSON.stringify(ov[id])) {
+        ov[id] = patch;
+        updated++;
       }
     });
-    localStorage.setItem(SK, JSON.stringify(overrides));
+    localStorage.setItem(SK, JSON.stringify(ov));
     await init();
-    showBanner('Synced from Google Sheets · ' + new Date().toLocaleTimeString());
+    showBanner('Synced · ' + updated + ' record' + (updated !== 1 ? 's' : '') + ' updated · ' + new Date().toLocaleTimeString());
     showToast('Sync complete!');
   } catch(e) {
-    showToast('Sync failed — check Sheet URL and permissions');
+    showToast('Sync failed — check Sheet URL and sharing settings');
   }
-  btn.textContent = '↻ Sync Sheet'; btn.classList.remove('syncing');
+  btn.textContent = '↻ Sync Sheet';
+  btn.classList.remove('syncing');
 }
 
-// ── RENDER ──
-function stClass(s) { return {pending:'st-pending',sent:'st-sent',replied:'st-replied',pass:'st-pass'}[s]||'st-pending'; }
-function stLabel(s) { return {pending:'Pending',sent:'Sent',replied:'Replied',pass:'Passed'}[s]||s; }
+function parseCSV(text) {
+  return text.trim().split('\n').map(line => {
+    const cols = []; let cur = ''; let inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+      else { cur += ch; }
+    }
+    cols.push(cur.trim());
+    return cols;
+  });
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function stClass(s) { return { pending:'st-pending', sent:'st-sent', replied:'st-replied', pass:'st-pass' }[s] || 'st-pending'; }
+function stLabel(s) { return { pending:'Pending', sent:'Sent', replied:'Replied', pass:'Passed' }[s] || s; }
+
+function intentBadgeHTML(intent, label) {
+  if (!intent) return '';
+  const cls = {
+    call:       'intent-call',
+    interested: 'intent-interested',
+    followup:   'intent-followup',
+    info:       'intent-info',
+    pass:       'intent-pass',
+  }[intent] || 'intent-followup';
+  const icons = { call:'📞', interested:'✦', followup:'↩', info:'?', pass:'—' };
+  const icon  = icons[intent] || '·';
+  const text  = label || { call:'Wants a call', interested:'Interested', followup:'Follow up', info:'Wants info', pass:'Not interested' }[intent] || intent;
+  return `<span class="intent-badge ${cls}">${icon} ${text}</span>`;
+}
 
 function render() {
-  const days = [...new Set(investors.map(i=>i.day))].sort((a,b)=>a-b);
+  const days      = [...new Set(investors.map(i => i.day))].sort((a,b) => a-b);
   const container = document.getElementById('days-container');
   container.innerHTML = '';
-  if (!investors.length) {
-    container.innerHTML = '<div class="empty-state">No investors loaded. Check investors.json.</div>';
+
+  const visible = filterStatus === 'all'
+    ? investors
+    : investors.filter(i => {
+        if (filterStatus === 'warm') return i.intent === 'call' || i.intent === 'interested';
+        return i.status === filterStatus;
+      });
+
+  if (!visible.length) {
+    container.innerHTML = '<div class="empty-state">No investors match this filter.</div>';
     updateStats(); return;
   }
+
   days.forEach(day => {
-    const group = investors.filter(i=>i.day===day);
+    const group = visible.filter(i => i.day === day);
     if (!group.length) return;
-    const wrap = document.createElement('div');
+
+    const wrap  = document.createElement('div');
     wrap.className = 'table-wrap';
+
+    const rows = group.map(i => {
+      const v      = i.variant || 'A';
+      const subj   = (i.variants && i.variants[v]) ? i.variants[v].subject : '—';
+      const recBit = (i.recommend && i.recommend !== v)
+        ? ` <span style="font-size:9px;color:var(--muted)">rec:${i.recommend}</span>` : '';
+      const hasAI  = !!(i.aiSummary || i.suggestedAction);
+      const aiBtn  = hasAI
+        ? `<button class="ai-expand-btn" id="xbtn-${i.id}" onclick="toggleAI('${i.id}')">
+             <span class="chevron">▾</span> AI insight
+           </button>` : '';
+      const intentHTML = intentBadgeHTML(i.intent, i.intentLabel);
+
+      const invRow = `<tr class="inv-row${hasAI ? ' has-ai' : ''}" id="row-${i.id}">
+        <td class="inv-name">
+          <a href="${i.url}" target="_blank" rel="noopener">${i.name}</a>
+          <div class="inv-loc">${i.location || ''}</div>
+          ${aiBtn}
+        </td>
+        <td><span class="focus-tag">${i.focus || '—'}</span></td>
+        <td><button class="vbtn" onclick="openMsg('${i.id}')">✉ ${v}${recBit}</button></td>
+        <td class="subj-cell" title="${esc(subj)}">${esc(subj)}</td>
+        <td>
+          <div class="status-wrap">
+            <select class="status-sel ${stClass(i.status)}" onchange="updStatus('${i.id}',this.value,this)">
+              ${['pending','sent','replied','pass'].map(s =>
+                `<option value="${s}"${i.status===s?' selected':''}>${stLabel(s)}</option>`
+              ).join('')}
+            </select>
+            ${intentHTML}
+          </div>
+        </td>
+        <td class="date-cell">${i.dateSent || '—'}${i.dateReplied ? '<br><span style="color:var(--replied);font-size:10px">↩ '+i.dateReplied+'</span>' : ''}</td>
+        <td><input class="notes-inp" value="${esc(i.notes || '')}" placeholder="Add note…" onblur="updNotes('${i.id}',this.value)" /></td>
+        <td><button class="del-btn" onclick="del('${i.id}')">×</button></td>
+      </tr>`;
+
+      const aiRow = hasAI ? `<tr class="ai-row hidden" id="airow-${i.id}">
+        <td colspan="8">
+          <div class="ai-content">
+            ${i.aiSummary ? `<div class="ai-block">
+              <div class="ai-block-label">AI Summary</div>
+              <div class="ai-block-text">${esc(i.aiSummary)}</div>
+            </div>` : ''}
+            ${i.suggestedAction ? `<div class="ai-block">
+              <div class="ai-block-label">Suggested Action</div>
+              <div class="ai-block-text action">${esc(i.suggestedAction)}</div>
+            </div>` : ''}
+            ${i.dateReplied ? `<div class="ai-block" style="flex:0;min-width:100px">
+              <div class="ai-block-label">Replied On</div>
+              <div class="ai-block-text">${esc(i.dateReplied)}</div>
+            </div>` : ''}
+          </div>
+        </td>
+      </tr>` : '';
+
+      return invRow + aiRow;
+    }).join('');
+
     wrap.innerHTML = `
       <div class="day-header">
         <span class="day-label">Day ${day}</span>
-        <span class="day-date">${group[0].dayLabel||''}</span>
+        <span class="day-date">${group[0].dayLabel || ''}</span>
+        <span class="day-count">${group.length} investor${group.length!==1?'s':''}</span>
       </div>
       <table>
         <thead><tr>
-          <th style="width:18%">Investor</th>
-          <th style="width:12%">Focus</th>
-          <th style="width:9%">Variant</th>
-          <th style="width:22%">Subject line</th>
-          <th style="width:10%">Status</th>
-          <th style="width:10%">Date sent</th>
-          <th style="width:14%">Notes</th>
+          <th style="width:17%">Investor</th>
+          <th style="width:11%">Focus</th>
+          <th style="width:7%">Variant</th>
+          <th style="width:21%">Subject line</th>
+          <th style="width:14%">Status / Intent</th>
+          <th style="width:10%">Date</th>
+          <th style="width:15%">Notes</th>
           <th style="width:5%"></th>
         </tr></thead>
-        <tbody>${group.map(i=>{
-          const v = i.variant||'A';
-          const subj = i.variants&&i.variants[v] ? i.variants[v].subject : '—';
-          const recNote = i.recommend && i.recommend !== v ? ` <span style="font-size:9px;color:var(--muted)">rec:${i.recommend}</span>` : '';
-          return `<tr>
-            <td class="inv-name">
-              <a href="${i.url}" target="_blank" rel="noopener">${i.name}</a>
-              <div class="inv-loc">${i.location||''}</div>
-            </td>
-            <td><span class="focus-tag">${i.focus||'—'}</span></td>
-            <td><button class="vbtn" onclick="openMsg('${i.id}')">✉ ${v}${recNote}</button></td>
-            <td class="subj-cell" title="${subj.replace(/"/g,'&quot;')}">${subj}</td>
-            <td><select class="status-sel ${stClass(i.status)}" onchange="updStatus('${i.id}',this.value)">${['pending','sent','replied','pass'].map(s=>`<option value="${s}" ${i.status===s?'selected':''}>${stLabel(s)}</option>`).join('')}</select></td>
-            <td class="date-cell">${i.dateSent||'—'}</td>
-            <td><input class="notes-inp" value="${(i.notes||'').replace(/"/g,'&quot;')}" placeholder="Add note…" onblur="updNotes('${i.id}',this.value)" /></td>
-            <td><button class="del-btn" onclick="del('${i.id}')">×</button></td>
-          </tr>`;
-        }).join('')}</tbody>
+        <tbody>${rows}</tbody>
       </table>`;
     container.appendChild(wrap);
   });
+
   updateStats();
 }
 
-function updateStats() {
-  const sent = investors.filter(i=>i.status==='sent'||i.status==='replied').length;
-  const rep = investors.filter(i=>i.status==='replied').length;
-  document.getElementById('s-total').textContent = investors.length;
-  document.getElementById('s-sent').textContent = sent;
-  document.getElementById('s-replied').textContent = rep;
-  document.getElementById('s-rate').textContent = sent ? Math.round(rep/sent*100)+'%' : '—';
+function toggleAI(id) {
+  const aiRow = document.getElementById('airow-' + id);
+  const btn   = document.getElementById('xbtn-'  + id);
+  if (!aiRow) return;
+  const hidden = aiRow.classList.toggle('hidden');
+  if (btn) btn.classList.toggle('open', !hidden);
 }
 
-function updStatus(id, val) {
-  const i = investors.find(x=>x.id===id);
+function updateStats() {
+  const sent    = investors.filter(i => i.status === 'sent' || i.status === 'replied').length;
+  const rep     = investors.filter(i => i.status === 'replied').length;
+  const warm    = investors.filter(i => i.intent === 'call' || i.intent === 'interested').length;
+  document.getElementById('s-total').textContent   = investors.length;
+  document.getElementById('s-sent').textContent    = sent;
+  document.getElementById('s-replied').textContent = rep;
+  document.getElementById('s-warm').textContent    = warm;
+  document.getElementById('s-rate').textContent    = sent ? Math.round(rep / sent * 100) + '%' : '—';
+}
+
+// ── MUTATIONS ────────────────────────────────────────────────────────────────
+function updStatus(id, val, sel) {
+  const i = investors.find(x => x.id === id);
   if (!i) return;
   i.status = val;
-  if (val==='sent' && !i.dateSent) i.dateSent = new Date().toLocaleDateString('en-CA');
-  saveOverrides(); render();
+  if (val === 'sent' && !i.dateSent) i.dateSent = new Date().toLocaleDateString('en-CA');
+  if (sel) { sel.className = 'status-sel ' + stClass(val); }
+  saveOverrides();
+  updateStats();
 }
 
 function updNotes(id, val) {
-  const i = investors.find(x=>x.id===id);
+  const i = investors.find(x => x.id === id);
   if (i) { i.notes = val; saveOverrides(); }
 }
 
 function del(id) {
-  if (!confirm('Remove from view? (Does not delete from investors.json)')) return;
-  investors = investors.filter(x=>x.id!==id);
+  if (!confirm('Remove from view? (Does not affect investors.json)')) return;
+  investors = investors.filter(x => x.id !== id);
   saveOverrides(); render();
 }
 
-// ── MESSAGE MODAL ──
+// ── MESSAGE MODAL ────────────────────────────────────────────────────────────
 function openMsg(id) {
-  const i = investors.find(x=>x.id===id);
+  const i = investors.find(x => x.id === id);
   if (!i) return;
-  activeId = id; activeTab = i.variant||'A';
+  activeId  = id;
+  activeTab = i.variant || 'A';
   document.getElementById('m-name').textContent = i.name;
-  document.getElementById('m-sub').textContent = (i.focus||'') + ' · ' + (i.location||'');
+  document.getElementById('m-sub').textContent  = (i.focus || '') + ' · ' + (i.location || '');
   const rec = document.getElementById('m-rec');
-  if (i.recommend) { rec.style.display='block'; rec.textContent = '★ Recommended: Variant ' + i.recommend; }
-  else rec.style.display='none';
-  renderVTabs(i); showVar(i, activeTab);
+  if (i.recommend) { rec.style.display = 'block'; rec.textContent = '★ Recommended: Variant ' + i.recommend; }
+  else rec.style.display = 'none';
+  renderVTabs(i);
+  showVar(i, activeTab);
   document.getElementById('ov-msg').classList.add('open');
 }
 
 function renderVTabs(i) {
-  document.getElementById('m-vtabs').innerHTML = Object.keys(i.variants||{}).map(t =>
-    `<span class="vtab ${t===activeTab?'active':''}" onclick="switchTab('${t}')">Variant ${t} — ${t==='A'?'ROI-forward':'Curiosity hook'}</span>`
+  document.getElementById('m-vtabs').innerHTML = Object.keys(i.variants || {}).map(t =>
+    `<span class="vtab${t === activeTab ? ' active' : ''}" onclick="switchTab('${t}')">
+       Variant ${t} — ${t === 'A' ? 'ROI-forward' : 'Curiosity hook'}
+     </span>`
   ).join('');
 }
 
 function switchTab(t) {
   activeTab = t;
-  const i = investors.find(x=>x.id===activeId);
+  const i = investors.find(x => x.id === activeId);
   if (!i) return;
-  i.variant = t; saveOverrides();
-  renderVTabs(i); showVar(i, t); render();
+  i.variant = t;
+  saveOverrides();
+  renderVTabs(i);
+  showVar(i, t);
+  render();
 }
 
 function showVar(i, t) {
-  const v = (i.variants||{})[t]||{};
-  document.getElementById('m-subj').value = v.subject||'';
-  document.getElementById('m-body').value = v.body||'';
+  const v = (i.variants || {})[t] || {};
+  document.getElementById('m-subj').value = v.subject || '';
+  document.getElementById('m-body').value = v.body    || '';
 }
 
 function closeMsg() { document.getElementById('ov-msg').classList.remove('open'); }
 
 function copyMsg() {
-  const text = 'Subject: ' + document.getElementById('m-subj').value + '\n\n' + document.getElementById('m-body').value;
-  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!')).catch(()=>{});
+  const text = 'Subject: ' + document.getElementById('m-subj').value
+             + '\n\n'      + document.getElementById('m-body').value;
+  navigator.clipboard.writeText(text)
+    .then(() => showToast('Copied to clipboard!'))
+    .catch(() => {});
 }
 
 function markSent() {
-  const i = investors.find(x=>x.id===activeId);
+  const i = investors.find(x => x.id === activeId);
   if (i) {
-    i.status = 'sent'; i.variant = activeTab;
+    i.status  = 'sent';
+    i.variant = activeTab;
     if (!i.dateSent) i.dateSent = new Date().toLocaleDateString('en-CA');
     saveOverrides(); render();
   }
   closeMsg();
 }
 
-document.getElementById('ov-msg').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeMsg(); });
+document.getElementById('ov-msg').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeMsg();
+});
 
-// ── HELPERS ──
-function showToast(msg, dur=2800) {
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg, dur = 2800) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), dur);
+  setTimeout(() => t.classList.remove('show'), dur);
 }
 
 function showBanner(msg) {

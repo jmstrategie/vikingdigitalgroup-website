@@ -84,3 +84,15 @@ without losing any status updates users have made in the app.
 2. Claude scrapes + writes personalized messages → generates new `investors.json`
 3. Commit `investors.json` → Netlify redeploys in ~30 seconds
 4. Open `vikingdigitalgroup.com/intranet/` → new investors appear automatically
+
+---
+
+## Reply automation (Zoho Mail + Zapier + Claude API)
+
+When investors reply via askforfunding.com, their status, intent, and an AI summary
+can be automatically pushed to the tracker. See **`automation.md`** for full setup.
+
+Requires:
+- A Google Sheet (free) — acts as the write target for Zapier
+- A Zapier account (free tier covers this volume)
+- An Anthropic API key (console.anthropic.com) — ~$0.001 per email
