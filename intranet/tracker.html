@@ -52,6 +52,9 @@ nav {
   font-size: 12px; padding: 6px 14px; border-radius: 4px; cursor: pointer;
   font-family: 'DM Sans', sans-serif; font-weight: 500; transition: all .15s;
 }
+.btn-push    { background: var(--gold); color: var(--navy); border: 1px solid var(--gold); font-weight: 600; }
+.btn-push:hover { background: var(--gold-light); border-color: var(--gold-light); }
+.btn-push.pushing { opacity: .6; cursor: not-allowed; }
 .btn-sync    { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--border); }
 .btn-sync:hover { border-color: var(--gold); }
 .btn-sync.syncing { opacity: .6; cursor: not-allowed; }
@@ -262,7 +265,8 @@ td { padding: 10px 12px; vertical-align: middle; }
   </div>
   <div class="nav-right">
     <span class="user-pill" id="user-email"></span>
-    <button class="nav-btn btn-sync" id="sync-btn" onclick="syncFromSheet()">↻ Sync Sheet</button>
+    <button class="nav-btn btn-push" id="push-btn" onclick="pushToSheet()">↑ Push to Sheet</button>
+    <button class="nav-btn btn-sync" id="sync-btn" onclick="syncFromSheet()">↓ Sync Sheet</button>
     <button class="nav-btn btn-ghost" onclick="signOut()">Sign out</button>
   </div>
 </nav>
@@ -307,8 +311,10 @@ td { padding: 10px 12px; vertical-align: middle; }
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────────
-// Paste your published Google Sheet CSV URL here after setup (see automation.md)
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRmeM5j0cz3x14b5ppgfc1rpDkuSKwyG5FWYvd5ILi-abpLEoRQqOlSasqnUklZXJSlL_wAkrjuJg28/pub?gid=0&single=true&output=csv';
+// Pull: published CSV URL (read-only, no auth needed)
+const SHEET_CSV_URL  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRmeM5j0cz3x14b5ppgfc1rpDkuSKwyG5FWYvd5ILi-abpLEoRQqOlSasqnUklZXJSlL_wAkrjuJg28/pub?gid=0&single=true&output=csv';
+// Push: Google Apps Script web app URL (see automation.md → Part 5 for setup)
+const SHEET_PUSH_URL = '';
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 netlifyIdentity.on('init', user => {
@@ -369,6 +375,44 @@ function saveOverrides() {
     };
   });
   localStorage.setItem(SK, JSON.stringify(ov));
+}
+
+// ── PUSH TO SHEET ─────────────────────────────────────────────────────────────
+async function pushToSheet() {
+  if (!SHEET_PUSH_URL) {
+    showToast('No Push URL set — see automation.md Part 5 for setup');
+    return;
+  }
+  const btn = document.getElementById('push-btn');
+  btn.textContent = '↑ Pushing…';
+  btn.classList.add('pushing');
+
+  // Build payload: only user-controlled fields
+  const updates = investors.map(i => ({
+    id:       i.id,
+    name:     i.name,
+    status:   i.status   || 'pending',
+    dateSent: i.dateSent || '',
+    notes:    i.notes    || '',
+    variant:  i.variant  || 'A',
+  }));
+
+  try {
+    // no-cors: Apps Script doesn't return CORS headers, but the write still happens
+    await fetch(SHEET_PUSH_URL, {
+      method: 'POST',
+      mode:   'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ updates }),
+    });
+    showToast('Pushed to Sheet ✓');
+    showBanner('Pushed ' + updates.length + ' records to Google Sheet · ' + new Date().toLocaleTimeString());
+  } catch(e) {
+    showToast('Push failed — check your Apps Script URL');
+  }
+
+  btn.textContent = '↑ Push to Sheet';
+  btn.classList.remove('pushing');
 }
 
 // ── GOOGLE SHEETS SYNC ────────────────────────────────────────────────────────

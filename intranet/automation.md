@@ -286,6 +286,95 @@ Warm Leads stat (top of tracker) counts `call` + `interested` replies automatica
 
 ---
 
+## Part 5 — Two-way sync (Push to Sheet)
+
+The tracker has an **↑ Push to Sheet** button that writes your current
+status/notes/variant/dateSent back to the Google Sheet. This lets you:
+
+1. Work in the tracker as normal (mark sent, add notes, change variants)
+2. Hit **↑ Push to Sheet** — your changes land in the Sheet instantly
+3. Open Claude chat → paste the CSV URL → ask it to plan replies/follow-ups
+4. Hit **↓ Sync Sheet** to pull back any Zapier AI classifications
+
+### 5.1 Create the Apps Script
+
+1. Open your **VDG Investor Tracker** Google Sheet
+2. Click **Extensions → Apps Script**
+3. Delete everything in `Code.gs` and paste this:
+
+```javascript
+function doPost(e) {
+  try {
+    const sheet   = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const data    = JSON.parse(e.postData.contents);
+    const rows    = sheet.getDataRange().getValues();
+    const headers = rows[0].map(h => h.toString().trim());
+
+    // Column index helpers
+    const col = name => headers.indexOf(name); // 0-based
+
+    data.updates.forEach(update => {
+      for (let i = 1; i < rows.length; i++) {
+        if (rows[i][col('id')] === update.id) {
+          const r = i + 1; // 1-based row number
+          if (col('status')   > -1) sheet.getRange(r, col('status')   + 1).setValue(update.status);
+          if (col('dateSent') > -1) sheet.getRange(r, col('dateSent') + 1).setValue(update.dateSent);
+          if (col('notes')    > -1) sheet.getRange(r, col('notes')    + 1).setValue(update.notes);
+          if (col('variant')  > -1) sheet.getRange(r, col('variant')  + 1).setValue(update.variant);
+          break;
+        }
+      }
+    });
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: true, updated: data.updates.length }))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: false, error: err.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// Test this function manually in the Apps Script editor to verify sheet access
+function doGet(e) {
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: 'VDG Push endpoint active' }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+```
+
+4. Click **Save** (disk icon)
+
+### 5.2 Deploy as web app
+
+1. Click **Deploy → New deployment**
+2. Click the gear icon next to "Type" → select **Web app**
+3. Set:
+   - **Description:** VDG Tracker Push
+   - **Execute as:** Me
+   - **Who has access:** Anyone
+4. Click **Deploy**
+5. Click **Authorize access** → choose your Google account → Allow
+6. Copy the **Web app URL** — it looks like:
+   `https://script.google.com/macros/s/XXXXXXXXXXXX/exec`
+
+### 5.3 Wire the URL into the tracker
+
+Open `intranet/tracker.html` and find:
+```js
+const SHEET_PUSH_URL = '';
+```
+Paste your web app URL between the quotes. Commit and push.
+
+> **Note:** Because of browser security rules, the push uses `no-cors` mode —
+> the data is written successfully but the browser can't read the confirmation.
+> The toast always shows success after sending. If something seems wrong,
+> check the Sheet directly or run a test in the Apps Script editor.
+
+---
+
 ## Part 4 — Costs
 
 | Service | Cost |
