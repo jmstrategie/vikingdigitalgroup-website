@@ -29,9 +29,9 @@ Create a new Google Sheet named **"VDG Investor Tracker"**.
 
 Row 1 must be these exact headers (copy/paste):
 
-| A   | B    | C      | D        | E           | F      | G           | H         | I               | J     | K       |
-|-----|------|--------|----------|-------------|--------|-------------|-----------|-----------------|-------|---------|
-| id  | name | status | dateSent | dateReplied | intent | intentLabel | aiSummary | suggestedAction | notes | variant |
+| A   | B    | C      | D        | E           | F      | G           | H         | I               | J     | K       | L       | M    |
+|-----|------|--------|----------|-------------|--------|-------------|-----------|-----------------|-------|---------|---------|------|
+| id  | name | status | dateSent | dateReplied | intent | intentLabel | aiSummary | suggestedAction | notes | variant | subject | body |
 
 ### 1.2 Seed with current investors
 
@@ -310,17 +310,22 @@ function doPost(e) {
     const rows    = sheet.getDataRange().getValues();
     const headers = rows[0].map(h => h.toString().trim());
 
-    // Column index helpers
-    const col = name => headers.indexOf(name); // 0-based
+    // Column index helper (0-based → +1 for Sheets API)
+    const col = name => headers.indexOf(name);
 
     data.updates.forEach(update => {
       for (let i = 1; i < rows.length; i++) {
         if (rows[i][col('id')] === update.id) {
           const r = i + 1; // 1-based row number
-          if (col('status')   > -1) sheet.getRange(r, col('status')   + 1).setValue(update.status);
-          if (col('dateSent') > -1) sheet.getRange(r, col('dateSent') + 1).setValue(update.dateSent);
-          if (col('notes')    > -1) sheet.getRange(r, col('notes')    + 1).setValue(update.notes);
-          if (col('variant')  > -1) sheet.getRange(r, col('variant')  + 1).setValue(update.variant);
+          const set = (name, val) => {
+            if (col(name) > -1) sheet.getRange(r, col(name) + 1).setValue(val);
+          };
+          set('status',   update.status);
+          set('dateSent', update.dateSent);
+          set('notes',    update.notes);
+          set('variant',  update.variant);
+          set('subject',  update.subject);
+          set('body',     update.body);
           break;
         }
       }
@@ -337,7 +342,6 @@ function doPost(e) {
   }
 }
 
-// Test this function manually in the Apps Script editor to verify sheet access
 function doGet(e) {
   return ContentService
     .createTextOutput(JSON.stringify({ status: 'VDG Push endpoint active' }))

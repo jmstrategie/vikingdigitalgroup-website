@@ -387,15 +387,21 @@ async function pushToSheet() {
   btn.textContent = '↑ Pushing…';
   btn.classList.add('pushing');
 
-  // Build payload: only user-controlled fields
-  const updates = investors.map(i => ({
-    id:       i.id,
-    name:     i.name,
-    status:   i.status   || 'pending',
-    dateSent: i.dateSent || '',
-    notes:    i.notes    || '',
-    variant:  i.variant  || 'A',
-  }));
+  // Build payload: user-controlled fields + sent email copy
+  const updates = investors.map(i => {
+    const v     = i.variant || 'A';
+    const vdata = (i.variants || {})[v] || {};
+    return {
+      id:       i.id,
+      name:     i.name,
+      status:   i.status   || 'pending',
+      dateSent: i.dateSent || '',
+      notes:    i.notes    || '',
+      variant:  v,
+      subject:  vdata.subject || '',
+      body:     vdata.body    || '',
+    };
+  });
 
   try {
     // no-cors: Apps Script doesn't return CORS headers, but the write still happens
