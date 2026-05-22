@@ -394,18 +394,29 @@ async function syncFromSheet() {
       const id = (cols[0] || '').trim();
       if (!id) return;
       if (!ov[id]) ov[id] = {};
+
+      const sheetStatus = (cols[2] || '').trim();
+      const localStatus = ov[id].status || '';
+      // Sheet status only wins if Zapier set something more advanced (replied/pass)
+      // Otherwise keep whatever the user set manually in the tracker
+      const statusOrder = { pending: 0, sent: 1, replied: 2, pass: 2 };
+      const useSheetStatus = sheetStatus &&
+        (statusOrder[sheetStatus] ?? 0) > (statusOrder[localStatus] ?? 0);
+
       const patch = {
-        status:          cols[2]  || ov[id].status,
-        dateSent:        cols[3]  || ov[id].dateSent,
-        dateReplied:     cols[4]  || '',
-        intent:          cols[5]  || '',
-        intentLabel:     cols[6]  || '',
-        aiSummary:       cols[7]  || '',
-        suggestedAction: cols[8]  || '',
-        notes:           cols[9]  !== undefined ? cols[9] : (ov[id].notes || ''),
-        variant:         cols[10] || ov[id].variant,
+        // User-controlled fields — local always wins unless Sheet is more advanced
+        status:          useSheetStatus ? sheetStatus : (localStatus || 'pending'),
+        dateSent:        ov[id].dateSent  || (cols[3] || ''),
+        notes:           ov[id].notes     !== undefined ? ov[id].notes : (cols[9] || ''),
+        variant:         ov[id].variant   || (cols[10] || ''),
+        // Zapier-controlled fields — Sheet always wins when non-empty
+        dateReplied:     (cols[4] || '').trim(),
+        intent:          (cols[5] || '').trim(),
+        intentLabel:     (cols[6] || '').trim(),
+        aiSummary:       (cols[7] || '').trim(),
+        suggestedAction: (cols[8] || '').trim(),
       };
-      // Only update if something changed
+
       if (JSON.stringify(patch) !== JSON.stringify(ov[id])) {
         ov[id] = patch;
         updated++;
