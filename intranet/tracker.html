@@ -265,8 +265,9 @@ td { padding: 10px 12px; vertical-align: middle; }
   </div>
   <div class="nav-right">
     <span class="user-pill" id="user-email"></span>
-    <button class="nav-btn btn-push" id="push-btn" onclick="pushToSheet()">↑ Push to Sheet</button>
-    <button class="nav-btn btn-sync" id="sync-btn" onclick="syncFromSheet()">↓ Sync Sheet</button>
+    <button class="nav-btn btn-push"  id="push-btn"    onclick="pushToSheet()">↑ Push to Sheet</button>
+    <button class="nav-btn btn-sync"  id="sync-btn"    onclick="syncFromSheet()">↓ Sync Sheet</button>
+    <button class="nav-btn btn-ghost" id="refresh-btn" onclick="forceRefresh()" title="Force reload investors.json from server">↺ Refresh</button>
     <button class="nav-btn btn-ghost" onclick="signOut()">Sign out</button>
   </div>
 </nav>
@@ -326,17 +327,19 @@ netlifyIdentity.on('logout', () => window.location.href = '/intranet/');
 function signOut() { netlifyIdentity.logout(); }
 
 // ── DATA ──────────────────────────────────────────────────────────────────────
-const SK = 'vdg_intranet_v2';
-let investors  = [];
-let activeId   = null;
-let activeTab  = 'A';
+const SK          = 'vdg_intranet_v2';
+const JSON_CACHE  = 'vdg_investors_json';
+const JSON_TTL    = 60 * 60 * 1000; // 1 hour — refresh from Netlify at most once/hr
+
+let investors    = [];
+let activeId     = null;
+let activeTab    = 'A';
 let filterStatus = 'all';
 
-async function init() {
+async function init(forceRefresh = false) {
   const overrides = loadOverrides();
   try {
-    const res  = await fetch('/intranet/investors.json?t=' + Date.now());
-    const data = await res.json();
+    const data = await loadInvestorsJSON(forceRefresh);
     investors  = data.investors.map(inv => mergeOverride(inv, overrides[inv.id] || {}));
     document.getElementById('sync-msg').textContent = 'Data loaded · Last updated: ' + data.lastUpdated;
   } catch(e) {
@@ -344,6 +347,23 @@ async function init() {
     showToast('Could not load investors.json — showing cached data');
   }
   render();
+}
+
+async function loadInvestorsJSON(forceRefresh = false) {
+  // Serve from localStorage cache if fresh enough
+  if (!forceRefresh) {
+    try {
+      const cached = JSON.parse(localStorage.getItem(JSON_CACHE) || 'null');
+      if (cached && (Date.now() - cached.ts) < JSON_TTL) {
+        return cached.data;
+      }
+    } catch(e) {}
+  }
+  // Fetch fresh from Netlify (no cache-bust param — let CDN cache work)
+  const res  = await fetch('/intranet/investors.json');
+  const data = await res.json();
+  localStorage.setItem(JSON_CACHE, JSON.stringify({ ts: Date.now(), data }));
+  return data;
 }
 
 function mergeOverride(inv, ov) {
@@ -375,6 +395,14 @@ function saveOverrides() {
     };
   });
   localStorage.setItem(SK, JSON.stringify(ov));
+}
+
+async function forceRefresh() {
+  const btn = document.getElementById('refresh-btn');
+  btn.textContent = '↺ Loading…';
+  await init(true); // bypass cache, hit Netlify
+  btn.textContent = '↺ Refresh';
+  showToast('Reloaded from server');
 }
 
 // ── PUSH TO SHEET ─────────────────────────────────────────────────────────────
@@ -472,7 +500,7 @@ async function syncFromSheet() {
       }
     });
     localStorage.setItem(SK, JSON.stringify(ov));
-    await init();
+    await init(true); // force-refresh investors.json alongside sheet sync
     showBanner('Synced · ' + updated + ' record' + (updated !== 1 ? 's' : '') + ' updated · ' + new Date().toLocaleTimeString());
     showToast('Sync complete!');
   } catch(e) {
