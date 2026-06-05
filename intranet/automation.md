@@ -29,9 +29,13 @@ Create a new Google Sheet named **"VDG Investor Tracker"**.
 
 Row 1 must be these exact headers (copy/paste):
 
-| A   | B    | C      | D        | E           | F      | G           | H         | I               | J     | K       | L       | M    |
-|-----|------|--------|----------|-------------|--------|-------------|-----------|-----------------|-------|---------|---------|------|
-| id  | name | status | dateSent | dateReplied | intent | intentLabel | aiSummary | suggestedAction | notes | variant | subject | body |
+| A   | B    | C      | D        | E           | F      | G           | H         | I               | J     | K       | L       |
+|-----|------|--------|----------|-------------|--------|-------------|-----------|-----------------|-------|---------|---------|
+| id  | name | status | dateSent | dateReplied | intent | intentLabel | aiSummary | suggestedAction | notes | variant | subject |
+
+> **Note:** Full email bodies are intentionally excluded — they live in `investors.json`
+> and are available to Claude via the repo. Keeping the Sheet lean reduces token usage
+> when pulling the CSV into Claude chat for reply planning.
 
 ### 1.2 Seed with current investors
 
@@ -325,7 +329,6 @@ function doPost(e) {
           set('notes',    update.notes);
           set('variant',  update.variant);
           set('subject',  update.subject);
-          set('body',     update.body);
           break;
         }
       }

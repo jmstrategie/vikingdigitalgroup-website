@@ -387,7 +387,7 @@ async function pushToSheet() {
   btn.textContent = '↑ Pushing…';
   btn.classList.add('pushing');
 
-  // Build payload: user-controlled fields + sent email copy
+  // Build payload: status/notes/variant + subject only (body stays in investors.json)
   const updates = investors.map(i => {
     const v     = i.variant || 'A';
     const vdata = (i.variants || {})[v] || {};
@@ -399,7 +399,6 @@ async function pushToSheet() {
       notes:    i.notes    || '',
       variant:  v,
       subject:  vdata.subject || '',
-      body:     vdata.body    || '',
     };
   });
 
